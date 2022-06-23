@@ -15,23 +15,39 @@ import java.util.Optional;
 @Controller
 public class BlogController {
 
-    private PostRepository postRepository;
+	private PostRepository postRepository;
 
-    public BlogController(PostRepository postRepository) {
-        this.postRepository = postRepository;
-    }
+	private CategoryRepository categoryRepository;
 
-    @RequestMapping("/")
-    public String listPosts(ModelMap modelMap) {
-        List<Post> posts = postRepository.findAll();
-        modelMap.put("posts", posts);
-        return "home";
-    }
+	public BlogController(PostRepository postRepository, CategoryRepository categoryRepository) {
+		this.postRepository = postRepository;
+		this.categoryRepository = categoryRepository;
+	}
 
-    @RequestMapping("/post/{id}")
-    public String postDetails(@PathVariable Long id, ModelMap modelMap) {
-        Post post = postRepository.findById(id).orElse(null);
-        modelMap.put("post", post);
-        return "post-details";
-    }
+	@RequestMapping("/")
+	public String listPosts(ModelMap modelMap) {
+		List<Post> posts = postRepository.findAll();
+		modelMap.put("posts", posts);
+		List<Category> categories = categoryRepository.findAll();
+		modelMap.put("categories", categories);
+		return "home";
+	}
+
+	@RequestMapping("/post/{id}")
+	public String postDetails(@PathVariable Long id, ModelMap modelMap) {
+		Post post = postRepository.findById(id).orElse(null);
+		modelMap.put("post", post);
+		return "post-details";
+	}
+
+	@RequestMapping("/category/{id}")
+	public String categoryList(@PathVariable Long id, ModelMap modelMap) {
+		Category category = categoryRepository.findById(id).orElse(null);
+		modelMap.put("category", category);
+		List<Post> posts = postRepository.findByCategory(category);
+		modelMap.put("posts", posts);
+		List<Category> categories = categoryRepository.findAll();
+		modelMap.put("categories", categories);
+		return "category-list";
+	}
 }
